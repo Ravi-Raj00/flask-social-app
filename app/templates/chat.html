@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <h2 class="mb-4">Chat with {{ recipient.username }}</h2>
+
+        <!-- Chat Bubble Container -->
+        <div class="chat-container border rounded p-3 mb-4" style="height: 50vh; overflow-y: scroll; display: flex; flex-direction: column-reverse;">
+            <!-- Messages will be injected here by the loop, in reverse order (newest at bottom) -->
+            <div style="display: flex; flex-direction: column;">
+                {% for message in messages %}
+                    {% if message.sender == current_user %}
+                        <!-- Current User's Message (Sent) -->
+                        <div class="alert alert-primary ms-auto" role="alert" style="width: 70%;">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">You</h6>
+                                <small>{{ message.timestamp.strftime('%Y-%m-%d %H:%M') }}</small>
+                            </div>
+                            <p class="mb-0">{{ message.body }}</p>
+                        </div>
+                    {% else %}
+                        <!-- Other User's Message (Received) -->
+                        <div class="alert alert-secondary me-auto" role="alert" style="width: 70%;">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ recipient.username }}</h6>
+                                <small>{{ message.timestamp.strftime('%Y-%m-%d %H:%M') }}</small>
+                            </div>
+                            <p class="mb-0">{{ message.body }}</p>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Message Form -->
+        <form action="" method="post">
+            {{ form.hidden_tag() }}
+            <div class="mb-3">
+                {{ form.message.label(class="form-label") }}
+                {{ form.message(class="form-control", rows=3) }}
+                {% for error in form.message.errors %}
+                <span class="text-danger">[{{ error }}]</span>
+                {% endfor %}
+            </div>
+            {{ form.submit(class="btn btn-primary") }}
+        </form>
+    </div>
+</div>
+{% endblock %}

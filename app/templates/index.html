@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h1 class="mb-4">Global Feed</h1>
+            {% for post in posts %}
+                <!-- Use our new custom card class -->
+                <div class="post-card">
+                    <div class="card-body">
+                        <!-- Author Image -->
+                        <img class="post-card-author-img" src="{{ url_for('static', filename='profile_pics/' + post.author.image_file) }}">
+                        
+                        <!-- Post Content -->
+                        <div class="post-card-content">
+                            <h5>
+                                <a href="{{ url_for('main.user_posts', username=post.author.username) }}" class="text-decoration-none">
+                                    {{ post.author.username }}
+                                </a>
+                                <!-- HTMX Delete Button -->
+                            </h5>
+                            <small class="text-muted">
+                                Posted on {{ post.timestamp.strftime('%Y-%m-%d %H:%M') }}
+                            </small>
+
+                            <!-- Post Body Text -->
+                            <p class="post-card-body-text">{{ post.body }}</p>
+
+                            <!-- Post Image (if it exists) -->
+                            {% if post.image_file %}
+                                <img src="{{ url_for('static', filename='post_pics/' + post.image_file) }}" class="img-fluid mt-3 rounded" alt="Post image">
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <p>No posts yet. Be the first!</p>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
