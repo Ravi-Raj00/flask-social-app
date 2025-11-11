@@ -157,20 +157,19 @@ def chat(username):
         db.session.commit()
         
         # --- HTMX Response ---
-        # Return the new list of messages
+        # Return the new list of messages, sorted .asc()
         messages = Message.query.filter(
             or_(
                 (Message.sender == current_user) & (Message.recipient == other_user),
                 (Message.sender == other_user) & (Message.recipient == current_user)
             )
-        ).order_by(Message.timestamp.asc()).all()
+        ).order_by(Message.timestamp.asc()).all() # <-- Must be .asc() (ascending)
         
         return render_template('_chat_messages.html', 
                                messages=messages, 
                                recipient=other_user)
 
     # --- GET: Just load the page "shell" ---
-    # We pass an empty list because HTMX will load the real messages
     return render_template('chat.html', title=f'Chat with {username}', 
                            form=form, recipient=other_user, messages=[])
 
@@ -266,7 +265,7 @@ def chat_messages(username):
             (Message.sender == current_user) & (Message.recipient == other_user),
             (Message.sender == other_user) & (Message.recipient == current_user)
         )
-    ).order_by(Message.timestamp.asc()).all()
+    ).order_by(Message.timestamp.asc()).all() # <-- Must be .asc() (ascending)
 
     # Render the PARTIAL template
     return render_template('_chat_messages.html', 

@@ -6,12 +6,12 @@
 
         <div id="chat-window"
              class="chat-container" 
-             style="height: 50vh; overflow-y: scroll; display: flex; flex-direction: column-reverse;"
+             style="height: 50vh; overflow-y: scroll;" 
              hx-get="{{ url_for('main.chat_messages', username=recipient.username) }}"
              hx-trigger="load, every 3s"
-             hx-swap="innerHTML">
-            
-            </div>
+             hx-swap="innerHTML"
+             hx-on::after-swap="this.scrollTop = this.scrollHeight">
+        </div>
 
         <form hx-post="{{ url_for('main.chat', username=recipient.username) }}"
               hx-target="#chat-window"
