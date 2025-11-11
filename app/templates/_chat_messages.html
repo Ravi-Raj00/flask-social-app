@@ -1,26 +1,25 @@
 <!-- 
   This partial template ONLY contains the messages.
-  This is what we fetch every 3 seconds.
+  The wrapper <div> has been REMOVED.
+  This stops the container from expanding.
 -->
-<div style="display: flex; flex-direction: column;">
-    {% for message in messages %}
-        {% if message.sender == current_user %}
-            <!-- Current User's Message (Sent) -->
-            <div class="chat-bubble chat-bubble-sent" role="alert">
-                <p class="mb-0">{{ message.body }}</p>
-                <div class="chat-bubble-meta">
-                    {{ message.timestamp.strftime('%H:%M') }}
-                </div>
+{% for message in messages %}
+    {% if message.sender == current_user %}
+        <!-- Current User's Message (Sent) -->
+        <div class="chat-bubble chat-bubble-sent" role="alert">
+            <p class="mb-0">{{ message.body }}</p>
+            <div class="chat-bubble-meta">
+                {{ message.timestamp.strftime('%H:%M') }}
             </div>
-        {% else %}
-            <!-- Other User's Message (Received) -->
-            <div class="chat-bubble chat-bubble-received" role="alert">
-                <h6 class="mb-1" style="font-size: 0.9rem; font-weight: 600;">{{ recipient.username }}</h6>
-                <p class="mb-0">{{ message.body }}</p>
-                <div class="chat-bubble-meta">
-                    {{ message.timestamp.strftime('%H:%M') }}
-                </div>
+        </div>
+    {% else %}
+        <!-- Other User's Message (Received) -->
+        <div class="chat-bubble chat-bubble-received" role="alert">
+            <h6 class="mb-1" style="font-size: 0.9rem; font-weight: 600;">{{ recipient.username }}</h6>
+            <p class="mb-0">{{ message.body }}</p>
+            <div class="chat-bubble-meta">
+                {{ message.timestamp.strftime('%H:%M') }}
             </div>
-        {% endif %}
-    {% endfor %}
-</div>
+        </div>
+    {% endif %}
+{% endfor %}

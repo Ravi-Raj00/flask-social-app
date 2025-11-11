@@ -5,33 +5,25 @@
         <h2 class="mb-4">Chat with {{ recipient.username }}</h2>
 
         <!-- 
-          --- HTMX POLLING ADDED HERE ---
-          hx-get: The URL to fetch for new content.
-          hx-trigger: "load" (gets messages on page load)
-                      "every 3s" (refreshes every 3 seconds)
-          hx-swap: "innerHTML" replaces the content *inside* this div.
+          --- HTMX POLLING CONTAINER ---
+          This div is now the main container.
+          Notice the "{% include ... %}" line is GONE.
+          'hx-trigger="load"' will now correctly load the messages
+          into this empty div on page load.
         -->
         <div id="chat-window"
              class="chat-container" 
+             style="height: 50vh; overflow-y: scroll; display: flex; flex-direction: column-reverse;"
              hx-get="{{ url_for('main.chat_messages', username=recipient.username) }}"
              hx-trigger="load, every 3s"
              hx-swap="innerHTML">
             
-            <!-- 
-              Messages will be loaded here by HTMX.
-              We can include the partial here to show
-              messages on the initial load instantly.
-            -->
-            {% include '_chat_messages.html' %}
+            <!-- This space is intentionally left empty! -->
+            <!-- HTMX will fill it. -->
 
         </div>
 
-        <!-- 
-          Message Form 
-          hx-post: Sends the form via AJAX.
-          hx-target: Puts the response (the new message list) into the #chat-window.
-          hx-on::after-request: Clears the form text after sending.
-        -->
+        <!-- Message Form -->
         <form hx-post="{{ url_for('main.chat', username=recipient.username) }}"
               hx-target="#chat-window"
               hx-swap="innerHTML"
