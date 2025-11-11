@@ -4,13 +4,6 @@
     <div class="col-md-8 offset-md-2">
         <h2 class="mb-4">Chat with {{ recipient.username }}</h2>
 
-        <!-- 
-          --- HTMX POLLING CONTAINER ---
-          This div is now the main container.
-          Notice the "{% include ... %}" line is GONE.
-          'hx-trigger="load"' will now correctly load the messages
-          into this empty div on page load.
-        -->
         <div id="chat-window"
              class="chat-container" 
              style="height: 50vh; overflow-y: scroll; display: flex; flex-direction: column-reverse;"
@@ -18,12 +11,8 @@
              hx-trigger="load, every 3s"
              hx-swap="innerHTML">
             
-            <!-- This space is intentionally left empty! -->
-            <!-- HTMX will fill it. -->
+            </div>
 
-        </div>
-
-        <!-- Message Form -->
         <form hx-post="{{ url_for('main.chat', username=recipient.username) }}"
               hx-target="#chat-window"
               hx-swap="innerHTML"

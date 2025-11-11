@@ -1,11 +1,5 @@
-<!-- 
-  This partial template ONLY contains the messages.
-  The wrapper <div> has been REMOVED.
-  This stops the container from expanding.
--->
 {% for message in messages %}
     {% if message.sender == current_user %}
-        <!-- Current User's Message (Sent) -->
         <div class="chat-bubble chat-bubble-sent" role="alert">
             <p class="mb-0">{{ message.body }}</p>
             <div class="chat-bubble-meta">
@@ -13,7 +7,6 @@
             </div>
         </div>
     {% else %}
-        <!-- Other User's Message (Received) -->
         <div class="chat-bubble chat-bubble-received" role="alert">
             <h6 class="mb-1" style="font-size: 0.9rem; font-weight: 600;">{{ recipient.username }}</h6>
             <p class="mb-0">{{ message.body }}</p>

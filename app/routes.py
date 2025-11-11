@@ -2,7 +2,7 @@ import os
 import secrets
 import bleach 
 from PIL import Image
-from flask import Blueprint, render_template, url_for, flash, redirect, request, current_app
+from flask import Blueprint, render_template, url_for, flash, redirect, request, current_app, send_from_directory
 from app import db, create_app
 from sqlalchemy import or_
 from app.forms import RegistrationForm, LoginForm, PostForm, UpdateAccountForm, MessageForm
@@ -149,7 +149,7 @@ def chat(username):
 
     form = MessageForm()
 
-    # --- POST: A new message is being sent ---
+    # --- POST: A new message is being sent (for HTMX) ---
     if form.validate_on_submit():
         clean_body = bleach.clean(form.message.data)
         msg = Message(sender=current_user, recipient=other_user, body=clean_body)
@@ -157,8 +157,7 @@ def chat(username):
         db.session.commit()
         
         # --- HTMX Response ---
-        # Instead of redirecting, we just return the new
-        # list of messages. HTMX will swap them into the chat window.
+        # Return the new list of messages
         messages = Message.query.filter(
             or_(
                 (Message.sender == current_user) & (Message.recipient == other_user),
@@ -171,9 +170,9 @@ def chat(username):
                                recipient=other_user)
 
     # --- GET: Just load the page "shell" ---
-    # HTMX will poll the chat_messages route to fill the window.
+    # We pass an empty list because HTMX will load the real messages
     return render_template('chat.html', title=f'Chat with {username}', 
-                           form=form, recipient=other_user, messages=[]) # Pass an empty list
+                           form=form, recipient=other_user, messages=[])
 
 
 @main.route("/messages")
