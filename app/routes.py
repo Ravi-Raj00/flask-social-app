@@ -141,38 +141,40 @@ def account():
 @main.route("/chat/<username>", methods=['GET', 'POST'])
 @login_required
 def chat(username):
-    # Find the user we are chatting with
     other_user = User.query.filter_by(username=username).first_or_404()
     
-    # Prevent users from chatting with themselves
     if other_user == current_user:
         flash('You cannot chat with yourself.', 'warning')
         return redirect(url_for('main.index'))
 
     form = MessageForm()
+
+    # --- POST: A new message is being sent ---
     if form.validate_on_submit():
-
-        # --- SECURITY FIX: Sanitize input ---
         clean_body = bleach.clean(form.message.data)
-        #----------------------------------------------
-
-        # A new message is being sent
         msg = Message(sender=current_user, recipient=other_user, body=clean_body)
         db.session.add(msg)
         db.session.commit()
-        # Redirect to the same page, but use GET to avoid form resubmission
-        return redirect(url_for('main.chat', username=username))
+        
+        # --- HTMX Response ---
+        # Instead of redirecting, we just return the new
+        # list of messages. HTMX will swap them into the chat window.
+        messages = Message.query.filter(
+            or_(
+                (Message.sender == current_user) & (Message.recipient == other_user),
+                (Message.sender == other_user) & (Message.recipient == current_user)
+            )
+        ).order_by(Message.timestamp.asc()).all()
+        
+        return render_template('_chat_messages.html', 
+                               messages=messages, 
+                               recipient=other_user)
 
-    # Get all messages between the two users, ordered by time
-    messages = Message.query.filter(
-        or_(
-            (Message.sender == current_user) & (Message.recipient == other_user),
-            (Message.sender == other_user) & (Message.recipient == current_user)
-        )
-    ).order_by(Message.timestamp.asc()).all() # .asc() for oldest-first chat view
-
+    # --- GET: Just load the page "shell" ---
+    # We no longer need to query messages here,
+    # HTMX will do it for us with the 'hx-get' trigger.
     return render_template('chat.html', title=f'Chat with {username}', 
-                           form=form, recipient=other_user, messages=messages)
+                           form=form, recipient=other_user, messages=[]) # Pass an empty list
 
 
 @main.route("/messages")
@@ -255,3 +257,20 @@ def delete_post(post_id):
     # and knows the delete was successful. It then removes
     # the element defined in hx-target.
     return ""
+
+@main.route("/chat/<username>/messages")
+@login_required
+def chat_messages(username):
+    other_user = User.query.filter_by(username=username).first_or_404()
+
+    messages = Message.query.filter(
+        or_(
+            (Message.sender == current_user) & (Message.recipient == other_user),
+            (Message.sender == other_user) & (Message.recipient == current_user)
+        )
+    ).order_by(Message.timestamp.asc()).all()
+
+    # Render the PARTIAL template
+    return render_template('_chat_messages.html', 
+                           messages=messages, 
+                           recipient=other_user)
