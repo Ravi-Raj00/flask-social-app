@@ -171,8 +171,7 @@ def chat(username):
                                recipient=other_user)
 
     # --- GET: Just load the page "shell" ---
-    # We no longer need to query messages here,
-    # HTMX will do it for us with the 'hx-get' trigger.
+    # HTMX will poll the chat_messages route to fill the window.
     return render_template('chat.html', title=f'Chat with {username}', 
                            form=form, recipient=other_user, messages=[]) # Pass an empty list
 
